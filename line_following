@@ -1,0 +1,132 @@
+#define in1 5
+#define in2 4
+
+#define in3 6
+#define in4 7
+#define enA 2
+#define enB 3
+
+const int pinIRd1 = 8;
+const int pinIRa1 = A3;
+const int pinIRd2 = 9;
+const int pinIRa2 = A2;
+const int pinIRd3 = 10;
+const int pinIRa3 = A1;
+int IRvalueA1 = 0;
+int IRvalueD1 = 0;
+
+int IRvalueA2 = 0;
+int IRvalueD2 = 0;
+
+int IRvalueA3 = 0;
+int IRvalueD3 = 0;
+ int state = 0;
+void setup() {
+  // put your setup code here, to run once:
+
+  pinMode(in1, OUTPUT);
+  pinMode(in2, OUTPUT);
+  pinMode(in3, OUTPUT);
+  pinMode(in4, OUTPUT);
+  pinMode(enA, OUTPUT);
+  pinMode(enB, OUTPUT);
+  
+  pinMode(pinIRd1,INPUT);
+  pinMode(pinIRa1,INPUT);
+  
+  pinMode(pinIRd2,INPUT);
+  pinMode(pinIRa2,INPUT);
+  
+  pinMode(pinIRd3,INPUT);
+  pinMode(pinIRa3,INPUT);
+  
+}
+
+void loop() {
+  // put your main code here, to run repeatedly:
+  if(state==0){
+    state=1;
+    delay(3000);
+    motorMaju();
+    analogWrite(enA, 255); // Send PWM signal to motor A
+    analogWrite(enB, 255);
+
+   
+  }else{
+    readSensor1();
+    readSensor2();
+    readSensor3();
+    if(IRvalueD1==1 || IRvalueA1>100){
+      koreksiKiri();
+    }else if(IRvalueD3==1 || IRvalueA3>100){
+      koreksiKanan();  
+    }else{
+       motorMaju();
+    }
+  }  
+
+}
+
+void motorMaju(){
+   // Set Motor B Forward
+    digitalWrite(in3, HIGH);
+    digitalWrite(in4, LOW);
+   // Set Motor A Forward
+    digitalWrite(in1, HIGH);
+    digitalWrite(in2, LOW);
+    
+}
+
+void readSensor1(){
+  IRvalueA1 = analogRead(pinIRa1);
+  IRvalueD1 = digitalRead(pinIRd1);
+  }
+  
+void readSensor2(){
+  IRvalueA2 = analogRead(pinIRa2);
+  IRvalueD2 = digitalRead(pinIRd2);
+  }
+  
+void readSensor3(){
+  IRvalueA3 = analogRead(pinIRa3);
+  IRvalueD3 = digitalRead(pinIRd3);
+  }
+void koreksiKanan(){  
+    motorKanan();
+    do{
+    readSensor2();  
+      }while(IRvalueD2==0 || IRvalueA2<100);
+      motorMaju();
+    
+  }
+
+void koreksiKiri(){
+  
+    motorKiri();
+    do{
+    readSensor2();  
+      }while(IRvalueD2==0 || IRvalueA2<100);
+      motorMaju();
+    
+  }
+
+
+  
+void motorKanan(){
+   // Set Motor A backward
+    digitalWrite(in1, HIGH);
+    digitalWrite(in2, LOW);
+     // Set Motor B backward
+    digitalWrite(in3, LOW);
+    digitalWrite(in4, LOW);
+}
+
+
+void motorKiri(){
+   // Set Motor A backward
+    digitalWrite(in1, LOW);
+    digitalWrite(in2, LOW);
+    // Set Motor B backward
+    digitalWrite(in3, HIGH);
+    digitalWrite(in4, LOW);
+}
